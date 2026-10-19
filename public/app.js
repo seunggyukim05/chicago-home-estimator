@@ -9,11 +9,22 @@ let config, lastResult, marketRequest = 0;
 let marketRows = [];
 let marketPage = 0;
 
-// Fetch JSON and surface a readable API error.
+// Read JSON safely, including when the hosting platform returns a plain-text error.
 async function request(url, options) {
-  const response = await fetch(url, options);
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+  const response = await fetch(url, { ...options, cache: 'no-store' });
+  const body = await response.text();
+  let data;
+  try {
+    data = JSON.parse(body);
+  } catch {
+    if (!response.ok) {
+      throw new Error('The server could not load the property service (HTTP ' + response.status + '). Please try again shortly.');
+    }
+    throw new Error('The property service returned an unexpected response. Please try again shortly.');
+  }
+  if (!response.ok) {
+    throw new Error(data?.error || 'The property service is unavailable (HTTP ' + response.status + ').');
+  }
   return data;
 }
 

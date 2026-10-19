@@ -1,6 +1,7 @@
 """Python prediction API. The model and data remain on the server."""
 import csv
 import json
+import logging
 import statistics
 import sys
 from datetime import datetime
@@ -95,6 +96,7 @@ class handler(BaseHTTPRequestHandler):
         except ValueError as error:
             self.reply(400, {"error": str(error)})
         except Exception:
+            logging.exception("Property API metadata/market request failed")
             self.reply(500, {"error": "The data could not be loaded. Please try again."})
 
     def do_POST(self):
@@ -108,4 +110,5 @@ class handler(BaseHTTPRequestHandler):
         except (ValueError, TypeError, KeyError, OverflowError) as error:
             self.reply(400, {"error": str(error) if isinstance(error, ValueError) else "Check that all property fields contain valid numbers."})
         except Exception:
+            logging.exception("Property API prediction request failed")
             self.reply(500, {"error": "The estimate is temporarily unavailable. Please try again."})

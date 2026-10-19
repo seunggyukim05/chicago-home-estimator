@@ -19,10 +19,18 @@ def predict_price(details, assets_dir):
         settings = json.load(f)
     expected_hash = settings.get("coefficient_sha256")
     if expected_hash:
-        actual_hash = hashlib.sha256(
-            (assets / "final_model_coefficients.csv").read_bytes()
-        ).hexdigest()
-        if actual_hash != expected_hash:
+        # Git may convert CSV line endings between Windows and Linux.
+        coefficient_bytes = (assets / "final_model_coefficients.csv").read_bytes()
+        lf_bytes = coefficient_bytes.replace(b"\r\n", b"\n")
+        compatible_hashes = {
+            hashlib.sha256(candidate).hexdigest()
+            for candidate in (
+                coefficient_bytes,
+                lf_bytes,
+                lf_bytes.replace(b"\n", b"\r\n"),
+            )
+        }
+        if expected_hash not in compatible_hashes:
             raise ValueError("The model coefficients and settings do not match.")
     with (assets / "final_model_coefficients.csv").open(
         encoding="utf-8-sig", newline=""
