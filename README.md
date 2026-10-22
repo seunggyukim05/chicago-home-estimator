@@ -1,66 +1,56 @@
 # Chicago Home Estimator
 
-A pricing starting point for real estate agents and homebuyers exploring Chicago homes. Enter a property's characteristics, receive an estimated sale price, and review historical transactions and market context.
+## Start your next pricing conversation with the numbers in hand.
 
-This BUSA 310 student prototype supports a pricing conversation. It is not an appraisal or a guaranteed listing or sale price.
+Chicago Home Estimator helps real estate agents prepare for conversations with buyers and sellers. Enter a home's recorded characteristics to get an estimated sale price, review historical sales, and explore transaction activity in its ZIP code—all in one place.
 
-## What you can do
+**[Try this Estimator](https://chicago-home-estimator.vercel.app/#estimate)**
 
-- **Get an Estimate:** Enter location, property class, size, age, bedrooms, and bathrooms.
-- **Review supporting sales:** See past transactions matched by ZIP and optional neighborhood, then ranked by building-area similarity.
-- **Explore Sales:** Review monthly transaction counts, median sale prices, and a comparison of equivalent calendar periods.
-- **About:** Understand the data sources, accuracy measures, and limitations.
-- **Save a summary:** Download the property inputs and result as a JSON file.
+No installation is needed. Open the website in your browser and have the property's recorded details ready.
 
-## How to use it
+## Built for your day-to-day work
 
-1. Choose **Get an Estimate** on the home page.
-2. Select the property's ZIP. Leave the optional Assessor neighborhood as **Not provided** if you do not know its verified code.
-3. Select the recorded Assessor property class. Use the property's Assessor record rather than guessing from its ZIP or appearance.
-4. Enter building area, land area, year built, bedrooms, and full and half bathrooms. Building area uses exterior measurements and may differ from interior living area in a listing.
-5. Choose **See My Estimate**. Today's Chicago date is applied by the server.
-6. Review the price, limitations, property details, and historical sales. Choose **Edit Property Details** to correct inputs or explore another scenario.
-7. Save a summary if useful, or use **Explore Sales** for broader market context.
+Whether you are preparing for a seller meeting or reviewing a property with a buyer, the tool gives you a starting estimate and supporting information to discuss.
 
-The supported properties are selected single-family residential classes and individually owned townhomes or row houses. The tool does not cover every property type or location.
+- **Estimate a sale price.** Use the home's location, size, age, property class, and room counts to calculate an estimate based on recorded sales.
+- **Review historical examples.** Browse past sales matched by ZIP and, optionally, Assessor neighborhood, then ranked by building-area similarity.
+- **Check the local picture.** Explore monthly sale prices and transaction counts, with comparisons covering equivalent calendar periods.
+- **Keep a record.** Download the entered property details and estimate as a JSON summary for your notes.
+- **Understand the numbers.** Review the data sources, model accuracy, and coverage limitations on the About page.
 
-## Understanding the result
+## Get an estimate
 
-The tool uses the group's ZIP-based log-price linear regression. Property size, age, rooms, property class, ZIP, and date-based features contribute to the estimate. The optional neighborhood code only filters historical examples; it does not affect the price.
+1. Open **[Get an Estimate](https://chicago-home-estimator.vercel.app/#estimate)**.
+2. Type or select the property's ZIP code. If you know its verified Assessor neighborhood code, add it to narrow the historical sales shown; otherwise leave **Not provided**.
+3. Select the recorded Assessor property class. Check the property's Assessor record rather than inferring the class from its ZIP or appearance.
+4. Enter the exterior building area, lot area, year built, bedrooms, and full and half bathrooms. Exterior building area may differ from the interior living area shown in a listing.
+5. Choose **See My Estimate**. The tool applies today's Chicago date automatically.
+6. Review the result and supporting sales. Use **Edit Property Details** to correct an input, or **Save Summary** to keep a copy.
 
-Recorded sales cover September 1, 2019 through August 11, 2026. Estimates after that period extend the fitted time trend; accuracy for the later period has not been established. Market summaries describe the supplied transaction sample, not every Chicago home or current listings.
+For broader context, open **[Explore Sales](https://chicago-home-estimator.vercel.app/#market)** and search by ZIP. The charts show the available monthly history; table controls let you browse 10, 20, 50, or 100 monthly records at a time.
 
-Average absolute error describes performance across evaluated sales, not an individual property's price range. No calibrated property-specific prediction interval is provided. Historical examples may differ in condition, renovations, layout, and sale circumstances; review their suitability before using them in a client discussion.
+## Explore sales on the ZIP map
 
-## Preview on your computer
+After getting an estimate, use the map beside the price summary. Hover over an area to see its ZIP and historical-example count, then click or tap to compare up to five sales against your home. You can also select an area using the ZIP list or use Tab and Enter on the map. **Back to my ZIP** restores the original location.
 
-From the `chicago-home-estimator` folder, run:
+Your home and estimated price stay visible as you explore. Explore Sales also includes a Chicago map: select an area to update the transaction count, median price, charts, and monthly table. The Overview below your estimate shows the entered details in two side-by-side tables on larger screens.
 
-```text
-python -m pip install -r requirements.txt
-python dev_server.py
-```
+The displayed median summarizes only the selected historical examples; it is not a revised estimate. Examples are ranked by building-area similarity and bedroom/full-bathroom differences, with newer sales breaking ties. Cross-ZIP prices are not adjusted for location or time.
 
-Open http://localhost:8000 in your browser. Keep the terminal open while testing and press Ctrl+C to stop. Opening the HTML file directly will not run the Python prediction service.
+The map uses locally stored City of Chicago ZIP boundaries and has no map API fees or billing setup. It shows approximate areas, not individual house locations. ZIP choices are restricted to the City of Chicago boundary list; estimates additionally require a ZIP supported by the model. Areas with no available examples show an empty-state message.
 
-Try an estimate, edit an input, save a summary, and change the ZIP on the market page. For automated checks:
+## Know what the estimate covers
 
-```text
-python -m unittest test_website_model.py test_api.py
-```
+The tool supports selected single-family residential classes and individually owned townhomes or row houses in the ZIP codes available on the site. It does not cover every property type or location.
 
-<!-- ## Project structure
+The estimate uses property characteristics, ZIP, and date-based features. The optional Assessor neighborhood code filters historical examples; it does not change the estimated price. Historical matching does not account for every difference in condition, renovations, layout, or transaction circumstances, so review each example before treating it as a suitable comparable.
 
-- `public/index.html`: website pages and property form.
-- `public/styles.css`: responsive appearance.
-- `public/app.js`: navigation, form interactions, and API requests.
-- `api/estimate.py`: Python backend for predictions, supporting sales, and market summaries.
-- `website_model.py`: the group's existing prediction calculation, unchanged by this migration.
-- `app_assets`: supplied data, exported coefficients, and settings used on the server.
-- `dev_server.py`: local preview server.
+The supplied records cover **September 1, 2019–August 11, 2026**. Estimates after that period extend the model's fitted time trend; accuracy for those later dates has not been established. Market summaries describe the supplied transaction sample, not current listings or all Chicago properties.
 
-The website uses HTML, CSS, JavaScript, and a Python backend. The requirements file contains the dependencies for this application.
+## Use it alongside your professional judgment
 
-Keep `app_assets/final_model_coefficients.csv` and `app_assets/final_model_settings.json` from the same export together. Other pickle and joblib files are not used for active estimates. Section 11 of `../04_final_model_testing.ipynb` documents the export and checks, with supporting results in `../model_artifacts/zip_log_price/`. The final holdout has been evaluated and should not be reused to select or tune revised models.
+A home's condition, recent improvements, and current competition deserve a closer look than these records can provide. Treat the result as a starting point for your assessment, alongside suitable recent comparable sales and your knowledge of the property.
 
-Students should review the interface and documentation, make the wording their own, and record coding assistance in the notebook's AI Use Log according to the assignment policy. -->
+Chicago Home Estimator is a BUSA 310 student prototype. It provides an estimated sale price—not an appraisal, an optimal asking price, or a guaranteed transaction value. Reported average error describes performance across evaluated sales and is not a price range for an individual home. No calibrated property-specific prediction interval is provided.
+
+**[Open Chicago Home Estimator](https://chicago-home-estimator.vercel.app/#estimate)**

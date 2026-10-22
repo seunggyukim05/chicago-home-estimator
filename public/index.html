@@ -12,8 +12,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cantata+One&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=20261018-2">
-    <script src="/app.js?v=20261018-2" defer>
+    <link rel="stylesheet" href="/styles.css?v=20261021-tooltips">
+    <script src="/county-map.js?v=20261021-tooltips" defer></script>
+    <script src="/zip-map.js?v=20261021-tooltips" defer></script>
+    <script src="/app.js?v=20261021-tooltips" defer>
     </script>
   </head>
   <body>
@@ -230,18 +232,18 @@
                 <div class="grid three">
                   <label>
                     Building area (sq ft)
-                    <input name="Building Area (sq ft)" type="number" min="100" max="30000" step="1" value="1400" required>
+                    <input name="Building Area (sq ft)" type="number" min="100" max="30000" step="1" required value="1400">
                     <small>
                       Exterior measurements
                     </small>
                   </label>
                   <label>
                     Land area (sq ft)
-                    <input name="Land Area (sq ft)" type="number" min="100" max="1000000" step="1" value="3750" required>
+                    <input name="Land Area (sq ft)" type="number" min="100" max="1000000" step="1" required value="3750">
                   </label>
                   <label>
                     Year built
-                    <input name="Year Built" id="year-built" type="number" min="1600" step="1" value="1950" required>
+                    <input name="Year Built" id="year-built" type="number" min="1600" step="1" required value="1950">
                   </label>
                 </div>
               </fieldset>
@@ -257,15 +259,15 @@
                 <div class="grid three">
                   <label>
                     Bedrooms
-                    <input name="Bedrooms" type="number" min="0" max="20" value="3" required>
+                    <input name="Bedrooms" type="number" min="0" max="20" required value="3">
                   </label>
                   <label>
                     Full bathrooms
-                    <input name="Full Bathrooms" type="number" min="0" max="15" value="1" required>
+                    <input name="Full Bathrooms" type="number" min="0" max="15" required value="1">
                   </label>
                   <label>
                     Half bathrooms
-                    <input name="Half Bathrooms" type="number" min="0" max="15" value="1" required>
+                    <input name="Half Bathrooms" type="number" min="0" max="15" required value="1">
                   </label>
                 </div>
               </fieldset>
@@ -302,54 +304,74 @@
         <p id="form-error" class="error" role="alert" hidden>
         </p>
         <section id="result" hidden tabindex="-1" aria-labelledby="result-heading">
-          <div class="section-heading">
-            <p class="eyebrow">
-              READY TO REVIEW
-            </p>
-            <h2 id="result-heading">
-              Your estimate
-              &
-              supporting sales
-            </h2>
-          </div>
-          <div class="estimate-card">
-            <p>
-              Estimated sale price
-            </p>
-            <strong id="price">
-            </strong>
-            <p id="result-date">
-            </p>
-            <p>
-              A model estimate, not an appraisal or guaranteed sale price.
-            </p>
+          <div class="result-hero">
+            <aside class="estimate-card result-price-panel">
+              <h2 id="result-heading" class="result-price-label">Estimated home value</h2>
+              <p id="result-location" class="result-location"></p>
+              <strong id="price"></strong>
+              <p id="result-date"></p>
+              <p class="result-disclaimer">Starting estimate for your pricing conversation</p>
+              <div id="result-features" class="result-features"></div>
+              <div class="actions">
+                <button id="edit" class="secondary" type="button">← Edit Property Details</button>
+                <button id="download" class="secondary" type="button">Save Summary (JSON)</button>
+              </div>
+              <button class="comparison-scroll-hint" id="scroll-comparisons" type="button">Scroll down for comparable homes <span aria-hidden="true">↓</span></button>
+            </aside>
+            <section class="result-location-map" aria-label="Property ZIP area">
+              <div class="result-map-heading"><h3>Your home’s ZIP</h3><button id="reset-zip-map" class="secondary" type="button">Reset view</button></div>
+            <div class="zip-map-shell">
+              <div id="zip-map" aria-label="Chicago ZIP area map"></div>
+              <p id="subject-zip-badge" class="subject-zip-badge"></p>
+              <p id="zip-map-tooltip" class="zip-map-tooltip">Hover over a ZIP area</p>
+            </div>
+              <p id="zip-map-status" class="muted" role="status">Loading Chicago ZIP areas…</p>
+            </section>
           </div>
           <div class="notice">
             The supplied sales end August 11, 2026. Later estimates extend the fitted time trend; accuracy for this later period has not been established. No individual prediction interval is available.
           </div>
-          <div class="actions">
-            <button id="edit" class="secondary">
-              ← Edit Property Details
-            </button>
-            <button id="download" class="secondary">
-              Save Summary (JSON)
-            </button>
-          </div>
-          <details>
+          <details class="property-overview property-details-panel">
             <summary>
-              Review entered property details
+              <span>
+                <span class="property-details-title">Property details</span>
+                <span class="muted">Expand to review the details behind your estimate.</span>
+              </span>
+              <svg class="property-details-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </summary>
-            <dl id="property-summary">
-            </dl>
+            <div class="overview-columns">
+              <dl id="property-summary" class="overview-details"></dl>
+              <dl id="property-summary-secondary" class="overview-details"></dl>
+            </div>
           </details>
-          <h2>
-            Historical sales to review
-          </h2>
-          <p>
-            Matched by ZIP and optional neighborhood, then ranked by exterior building-area similarity. These are past transactions, not current listings; condition and other differences may affect comparability.
-          </p>
-          <div id="comparables" class="grid three">
-          </div>
+          <!-- Map selection changes only historical examples, not the subject estimate. -->
+          <section class="zip-explorer" aria-labelledby="zip-explorer-heading">
+            <p class="eyebrow">LOOK BEYOND ONE ZIP</p>
+            <h2 id="zip-explorer-heading">Compare homes in another ZIP</h2>
+            <p>Choose a ZIP on the map or below to review similar historical sales.</p>
+            <div class="comparison-controls">
+              <label for="comparison-zip">Compare sales in ZIP
+                <select id="comparison-zip"></select>
+              </label>
+              <button id="reset-comparison" class="secondary" type="button">Back to my ZIP</button>
+
+            </div>
+
+
+            <p class="muted">Map: <a href="https://data.cityofchicago.org/d/unjd-c2ca" target="_blank" rel="noopener">City of Chicago ZIP boundaries</a>. Areas are approximate, not house locations. Only ZIPs represented in this Chicago map are available.</p>
+            <div id="comparison-metrics" class="grid two"></div>
+            <p id="comparison-status" role="status" aria-live="polite"></p>
+            <div class="table-wrap">
+              <table>
+                <caption>Historical examples ranked by building area, bedrooms, and full bathrooms; newer sales break ties.</caption>
+                <thead><tr><th scope="col">Property</th><th scope="col">ZIP</th><th scope="col">Building area</th><th scope="col">Beds</th><th scope="col">Full baths</th><th scope="col">Sale price</th><th scope="col">Sale date</th></tr></thead>
+                <tbody id="comparison-rows"></tbody>
+              </table>
+            </div>
+            <p class="muted">Sale prices are historical and not adjusted for time or location. Matching does not account for condition or property class. A similar home in a different ZIP can have a very different value. These are examples to review, not verified appraisal comparables.</p>
+          </section>
         </section>
       </section>
       <!-- Searchable market summaries, charts, and monthly table. -->
@@ -374,7 +396,16 @@
         </label>
         <p id="market-status" role="status">
         </p>
-        <div class="grid two" id="market-metrics">
+        <div class="market-map-layout">
+          <section class="market-map-panel" aria-label="Explore Chicago ZIP sales">
+            <div class="result-map-heading"><h3>Chicago ZIP areas</h3><button id="reset-market-map" class="secondary" type="button">Reset view</button></div>
+            <div class="zip-map-shell">
+              <div id="market-area-map" aria-label="Chicago ZIP sales map"></div>
+              <p id="market-map-tooltip" class="zip-map-tooltip">Hover over a ZIP area</p>
+            </div>
+            <p id="market-map-status" class="muted" role="status">Click a ZIP to update the sales summary.</p>
+          </section>
+          <div id="market-metrics" class="market-metric-stack"></div>
         </div>
         <h2>
           Monthly sales history

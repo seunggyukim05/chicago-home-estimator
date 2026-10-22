@@ -207,6 +207,7 @@ function validateChoices() {
 
 // Load market summaries and ignore outdated responses.
 async function loadMarket() {
+  window.zipExplorer.syncMarketZip($('market-zip').value.trim());
   const requestId = ++marketRequest;
   $('market-status').textContent = 'Loading recorded sales…';
   marketRows = [];
@@ -253,7 +254,7 @@ $('property-class').addEventListener('input', validateChoices);
 $('market-zip').addEventListener('input', () => {
   if (!config) return;
   const zip = $('market-zip').value.trim();
-  const valid = !zip || config.zip_codes.includes(zip);
+  const valid = !zip || config.market_zip_codes.includes(zip);
   $('market-zip').setCustomValidity(valid ? '' : 'Choose a supported ZIP from the suggestions.');
   if (valid) loadMarket();
   else {
@@ -292,21 +293,37 @@ $('property-form').addEventListener('submit', async event => {
     lastResult = data;
     $('price').textContent = money(data.price);
     $('result-date').textContent = 'Estimate date: '+data.details['Valuation Date'];
-    $('property-summary').replaceChildren();
-    Object.entries(data.details).forEach(([key, value]) => {
-      const dt = document.createElement('dt'), dd = document.createElement('dd');
-      dt.textContent = key;
-      dd.textContent = value === '' ? 'Not provided' : value;
-      $('property-summary').append(dt, dd);
+    $('result-location').textContent = 'ZIP ' + data.details['ZIP Code'] + ' · ' + (data.details['Property Class'] === '295' ? 'Townhome / row house' : 'Single-family home');
+    $('result-features').replaceChildren();
+    const features = [
+      ['Bedrooms', data.details.Bedrooms],
+      ['Bathrooms', data.details['Full Bathrooms'] + ' full · ' + data.details['Half Bathrooms'] + ' half'],
+      ['Building area', Number(data.details['Building Area (sq ft)']).toLocaleString() + ' sq ft'],
+      ['Year built', data.details['Year Built']],
+    ];
+    features.forEach(([label, value]) => {
+      const item = document.createElement('div');
+      const number = document.createElement('strong');
+      const caption = document.createElement('span');
+      number.textContent = value;
+      caption.textContent = label;
+      item.append(number, caption);
+      $('result-features').append(item);
     });
-    $('comparables').replaceChildren(...data.comparables.map(sale => card(money(Number(sale.sale_price)), Number(sale.char_bldg_sf).toLocaleString()+' sq ft', `Recorded ${sale.sale_date.slice(0,10)} · ZIP ${sale.zip_code} · Neighborhood ${sale.nbhd}`)));
-    if (!data.comparables.length) {
-      const p = document.createElement('p');
-      p.textContent = 'No matching sales were found in this sample. Other comparable transactions may exist.';
-      $('comparables').append(p);
-    }
+    $('property-summary').replaceChildren();
+    $('property-summary-secondary').replaceChildren();
+    const detailEntries = Object.entries(data.details);
+    const splitAt = Math.ceil(detailEntries.length / 2);
+    detailEntries.forEach(([key, value], index) => {
+      const dt = document.createElement('dt');
+      const dd = document.createElement('dd');
+      dt.textContent = key;
+      dd.textContent = value === '' ? 'Not provided' : key === 'Property Class' ? value + ' — ' + config.house_classes[value] : value;
+      $(index < splitAt ? 'property-summary' : 'property-summary-secondary').append(dt, dd);
+    });
     $('property-form').hidden = true;
     $('result').hidden = false;
+    window.zipExplorer.show(data, config);
     $('result').focus();
     $('result').scrollIntoView( {
       behavior: 'smooth', block: 'start'
@@ -346,15 +363,47 @@ $('download').addEventListener('click', () => {
 window.addEventListener('hashchange', route);
 route();
 
+// Accept older API metadata while a restarted or redeployed backend catches up.
+function normalizeMetadata(data) {
+  if (!Array.isArray(data?.zip_codes) || !data.zip_codes.length || !data.house_classes || !data.today) {
+    throw new Error('The property service returned incomplete setup information. Restart the local server or redeploy the latest backend.');
+  }
+  return {
+    ...data,
+    neighborhoods: data.neighborhoods || {},
+    market_zip_codes: Array.isArray(data.market_zip_codes) ? data.market_zip_codes : data.zip_codes,
+    comparison_counts: data.comparison_counts || {},
+    market_counts: data.market_counts || {},
+  };
+}
+
 // Load supported choices and model information before enabling the form.
-request('/api/estimate').then(data => {
+Promise.all([
+  request('/api/estimate'),
+  request('/assets/chicago-zip-boundaries.geojson'),
+]).then(([responseData, boundaries]) => {
+  const data = normalizeMetadata(responseData);
+  // Cross-check API choices against the map, including when an older API is running.
+  const chicagoZips = new Set(boundaries.features.map(feature => String(feature.properties.zip)));
+  data.zip_codes = data.zip_codes.filter(zip => chicagoZips.has(zip));
+  data.market_zip_codes = data.market_zip_codes.filter(zip => chicagoZips.has(zip));
+  if (!data.zip_codes.length) throw new Error('No supported Chicago ZIPs were returned by the property service.');
+  $('zip-options').replaceChildren();
+  $('market-zip-options').replaceChildren();
+  $('class-options').replaceChildren();
   config = data;
   data.zip_codes.forEach(zip => {
     option($('zip-options'), zip);
-    option($('market-zip-options'), zip);
+
   });
+  data.market_zip_codes.forEach(zip => option($('market-zip-options'), zip));
+  if (responseData.market_counts) {
+    window.zipExplorer.showMarket(data);
+  } else {
+    $('market-map-status').textContent = 'Restart the local Python server or deploy the latest backend to load Chicago map coverage.';
+  }
   Object.entries(data.house_classes).forEach(([code, label]) => option($('class-options'), code, code+' — '+label));
-  $('zip').value = data.zip_codes[0];
+  $('zip').value = data.zip_codes.includes('60607') ? '60607' : data.zip_codes[0];
   $('property-class').value = '203';
   neighborhoods();
   $('estimate-date').textContent = data.today;
@@ -584,3 +633,8 @@ setupSearchDropdown('zip', 'zip-options');
 setupSearchDropdown('neighborhood', 'neighborhood-options', 'Not provided');
 setupSearchDropdown('property-class', 'class-options');
 setupSearchDropdown('market-zip', 'market-zip-options', 'All available ZIPs');
+
+// Jump to comparison sales without changing the app's active page route.
+$('scroll-comparisons').addEventListener('click', () => {
+  $('zip-explorer-heading').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+});

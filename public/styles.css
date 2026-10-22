@@ -1541,3 +1541,161 @@ button, .button, .secondary, .hero .button { border-radius: 999px; }
   #about #accuracy > .card,
   #about > .grid.three > .card { background-color: #443025; }
 }
+
+/* Local ZIP explorer uses the existing espresso/ivory glass palette. */
+.zip-explorer { margin-top: 48px; }
+.comparison-controls { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 14px; margin: 20px 0; }
+.comparison-controls label { max-width: 260px; margin: 0; flex: 1 1 220px; }
+.comparison-controls button { margin-bottom: 1px; }
+.zip-map-shell { position: relative; border-radius: 22px; border: 1px solid #ffffff60; overflow: hidden; background: radial-gradient(ellipse at 85% 15%, #c7b99e4d, transparent 60%), #faf3e54d; }
+#zip-map { position: relative; height: 480px; }
+#zip-map > svg { display: block; width: 100%; height: 100%; }
+.zip-area { fill: #c5a78480; stroke: #fff4df; stroke-width: 1; vector-effect: non-scaling-stroke; cursor: pointer; transition: fill .15s; }
+.zip-area.no-sales { fill: #c8c2b733; }
+.zip-area.is-subject { stroke: #51321e; stroke-width: 2.5; }
+.zip-area.is-selected { fill: #80583ed9; }
+.zip-area:hover, .zip-area:focus { fill: #a4754bc7; stroke: #4a2d1c; stroke-width: 2; outline: none; }
+.zip-map-tooltip { position: absolute; top: 12px; left: 14px; max-width: calc(100% - 90px); margin: 0; padding: 10px 15px; background: #fff8ebed; border: 1px solid #ffffff80; border-radius: 14px; font-size: 13px; pointer-events: none; }
+.zip-zoom-controls { position: absolute; top: 14px; right: 14px; display: grid; gap: 8px; }
+.zip-zoom-controls button { padding: 0; width: 40px; height: 40px; min-height: 40px; background: #fff8ebed; font-size: 22px; }
+#comparison-metrics { margin-top: 24px; }
+#comparison-metrics .metric { font-size: clamp(25px, 4vw, 36px); }
+.subject-row { background: #9b744427; font-weight: 600; }
+.zip-explorer .table-wrap { overflow-x: auto; }
+.zip-explorer table { min-width: 760px; }
+@media(max-width: 620px) { #zip-map { height: 400px; } .comparison-controls button { flex: 1 1 auto; } .zip-map-tooltip { font-size: 11px; padding: 8px 10px; } }
+
+/* Result page: price and quick facts on the left; full details below. */
+.result-hero { display: grid; grid-template-columns: 1.1fr 1fr; align-items: stretch; gap: 28px; }
+.result-price-panel { padding: 32px; }
+.result-price-panel > #price { font-size: clamp(38px, 4.6vw, 62px); overflow-wrap: anywhere; }
+.result-price-panel .result-disclaimer { color: #e6cfb6; font-size: 14px; }
+.result-features { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 26px; padding-top: 24px; border-top: 1px solid #e3c29a30; }
+.result-features > div { display: flex; flex-direction: column; gap: 5px; }
+.result-features strong { font-size: 20px; font-family: 'IBM Plex Sans JP', sans-serif; line-height: 1.4; }
+.result-features span { font-size: 12px; color: #e2cdb6; }
+.result-price-panel .actions { margin-bottom: 0; }
+.result-price-panel .secondary { color: #ffeed7; background: #fff7e91a; border-color: #e3c29a45; font-size: 13px; }
+.result-price-panel .secondary:hover { background: #fff7e92b; }
+.result-scene { position: relative; margin: 0; min-height: 350px; border-radius: 22px; overflow: hidden; background: #6d513a55; }
+.result-scene img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.result-scene figcaption { position: absolute; bottom: 0; left: 0; right: 0; margin: 0; padding: 30px 20px 16px; background: linear-gradient(transparent, #21160fe6); color: #fff0dc; font-size: 11px; }
+.property-overview { margin-top: 48px; scroll-margin-top: 130px; }
+.overview-details { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 0; border: 1px solid #ffffff30; border-radius: 18px; overflow: hidden; background: #fff6e620; }
+.overview-details dt, .overview-details dd { padding: 15px 22px; margin: 0; border-bottom: 1px solid #a587621a; font-size: 14px; }
+.overview-details dt:nth-of-type(even), .overview-details dd:nth-of-type(even) { background: #a98a6510; }
+.overview-details dt { color: #70543d; }
+.subject-zip-badge { position: absolute; bottom: 14px; left: 14px; margin: 0; padding: 10px 14px; background: #fff4d6ee; border: 1px solid #8b61396b; border-radius: 999px; color: #51321e; font-size: 12px; font-weight: 600; pointer-events: none; }
+/* The subject stays identifiable after selecting any other comparison ZIP. */
+.zip-area.is-subject, .zip-area.is-subject.is-selected { fill: #ddb15ac7; stroke: #482a15; stroke-width: 3; }
+.zip-area.is-subject:hover, .zip-area.is-subject:focus { fill: #efc46ce6; stroke: #482a15; stroke-width: 3.5; }
+@media (max-width: 800px) {
+  .result-hero { grid-template-columns: 1fr; }
+  .result-scene { min-height: 260px; }
+  .result-price-panel { padding: 25px; }
+}
+@media (max-width: 480px) {
+  .result-price-panel .actions button { width: 100%; }
+  .overview-details dt, .overview-details dd { padding: 12px; font-size: 12px; }
+  .subject-zip-badge { font-size: 10px; max-width: calc(100% - 28px); }
+}
+
+/* Once an estimate is ready, let the result be the page introduction. */
+#estimate:has(#result:not([hidden])) > h1,
+#estimate:has(#result:not([hidden])) > .eyebrow,
+#estimate:has(#result:not([hidden])) > .lead { display: none; }
+
+/* Desktop result: 30% summary, 70% interactive county map. */
+.result-hero { grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 24px; }
+.result-price-panel { padding: 24px; min-width: 0; }
+.result-price-panel > #price { font-size: clamp(30px, 3.6vw, 46px); }
+.result-price-panel .actions { display: grid; gap: 10px; }
+.result-price-panel .actions button { width: 100%; padding: 11px 12px; }
+.result-price-panel .result-features { gap: 16px 10px; }
+.result-features strong { font-size: 17px; }
+.result-location-map { min-width: 0; }
+.result-map-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.result-map-heading h3 { margin: 0; }
+.result-map-heading button { padding: 8px 14px; font-size: 12px; }
+.overview-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.overview-columns .overview-details { margin: 0; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+.overview-columns dd { overflow-wrap: anywhere; }
+.market-map-layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); gap: 24px; align-items: stretch; margin: 24px 0 40px; }
+.market-map-panel { min-width: 0; }
+#market-area-map { position: relative; height: 420px; }
+#market-area-map > svg { display: block; width: 100%; height: 100%; }
+.market-metric-stack { display: flex; flex-direction: column; gap: 20px; padding-top: 50px; }
+.market-metric-stack > .card { flex: 1; margin: 0; display: flex; flex-direction: column; justify-content: center; }
+.market-metric-stack .metric { font-size: clamp(26px, 3vw, 38px); overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .result-hero, .market-map-layout { grid-template-columns: 1fr; }
+  .market-metric-stack { padding-top: 0; flex-direction: row; }
+  .market-metric-stack > .card { min-width: 0; }
+  .result-price-panel .actions { display: flex; }
+  .result-price-panel .actions button { width: auto; }
+}
+@media (max-width: 650px) {
+  .overview-columns { grid-template-columns: 1fr; gap: 16px; }
+  .market-metric-stack { flex-direction: column; }
+  #market-area-map { height: 400px; }
+  .result-price-panel .actions { display: grid; }
+  .result-price-panel .actions button { width: 100%; }
+}
+
+/* Native details supports keyboard, touch, and screen-reader expand/collapse. */
+#result > .property-details-panel { margin-top: 32px; padding: 22px 24px; }
+.property-details-panel > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  color: var(--ink);
+}
+.property-details-panel > summary::-webkit-details-marker { display: none; }
+.property-details-panel > summary > span { display: grid; gap: 6px; }
+.property-details-title { font-family: 'Cantata One', Georgia, serif; font-weight: 400; font-size: 25px; }
+.property-details-panel > summary .muted { font-weight: 400; }
+.property-details-chevron { width: 24px; height: 24px; flex-shrink: 0; transition: transform .18s; }
+.property-details-panel[open] .property-details-chevron { transform: rotate(180deg); }
+.property-details-panel[open] > summary { margin-bottom: 24px; }
+
+/* One price heading, with the property type and ZIP inside its summary card. */
+.result-price-panel .result-price-label {
+  margin: 0 0 8px;
+  font-family: 'IBM Plex Sans JP', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #ead4ba;
+}
+.result-price-panel .result-location { margin: 0 0 20px; color: #fff0df; font-size: 14px; }
+
+/* Keep map labels above the SVG regardless of surrounding glass layers. */
+.zip-map-shell { isolation: isolate; }
+.zip-map-tooltip {
+  z-index: 6;
+  display: block;
+  color: #382619;
+  background: #fff8eef5;
+  box-shadow: 0 4px 16px #50331f20;
+  border-color: #b4936b66;
+  max-width: calc(100% - 20px);
+  width: max-content;
+  pointer-events: none;
+}
+.zip-zoom-controls { z-index: 7; }
+.subject-zip-badge { z-index: 5; }
+.comparison-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: #efd5b5;
+  font-size: 12px;
+  text-decoration: none;
+}
+.comparison-scroll-hint:hover { color: #fff2df; text-decoration: underline; }
+#zip-explorer-heading { scroll-margin-top: 130px; }
+
+.comparison-scroll-hint { background: none; border: 0; padding: 0; cursor: pointer; min-height: 32px; font-family: inherit; text-align: left; }
