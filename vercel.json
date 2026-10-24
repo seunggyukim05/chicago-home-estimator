@@ -4,7 +4,7 @@
   "outputDirectory": "public",
   "functions": {
     "api/estimate.py": {
-      "includeFiles": "app_assets/**"
+      "includeFiles": "{app_assets/**,public/assets/chicago-zip-boundaries.geojson}"
     }
   }
 }
