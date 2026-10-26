@@ -97,6 +97,27 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(http_request('/api/estimate', payload)[0], 400)
         self.assertEqual(http_request('/api/estimate?view=market&zip=60016')[0], 400)
 
+    def test_zip_list_matches_map_and_does_not_require_public_files(self):
+        from api.estimate import market_zip_codes, metadata
+        from unittest.mock import patch
+        boundaries = json.loads((ROOT / 'public/assets/chicago-zip-boundaries.geojson').read_text())
+        expected = {feature['properties']['zip'] for feature in boundaries['features']}
+        self.assertEqual(set(market_zip_codes()), expected)
+        original_read = type(ROOT).read_text
+
+        def server_only_read(path, *args, **kwargs):
+            if 'public' in path.parts:
+                raise FileNotFoundError('Public files are not in the function bundle')
+            return original_read(path, *args, **kwargs)
+
+        market_zip_codes.cache_clear()
+        try:
+            with patch.object(type(ROOT), 'read_text', server_only_read):
+                self.assertEqual(set(market_zip_codes()), expected)
+                self.assertGreater(len(metadata()['zip_codes']), 0)
+        finally:
+            market_zip_codes.cache_clear()
+
     def test_source_is_not_public(self):
         self.assertEqual(http_request('/website_model.py', static=True)[0], 404)
         self.assertEqual(http_request('/app_assets/final_model_settings.json', static=True)[0], 404)

@@ -58,8 +58,9 @@ def market_counts():
 # Restrict website choices to ZIPs represented in the official Chicago map.
 @lru_cache(maxsize=1)
 def market_zip_codes():
-    data = json.loads((ROOT / "public/assets/chicago-zip-boundaries.geojson").read_text())
-    return sorted({feature["properties"]["zip"] for feature in data["features"]})
+    # Server assets are bundled independently from the public website files.
+    codes = json.loads((ASSETS / "chicago-zip-codes.json").read_text(encoding="utf-8"))
+    return sorted(set(codes))
 
 
 # Prediction inputs must also be categories supported by the existing model.
