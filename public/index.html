@@ -214,9 +214,10 @@
                 </h2>
                 <label>
                   Recorded Assessor property class
-                  <input name="Property Class" id="property-class" list="class-options" autocomplete="off" placeholder="Type a class code or search its description" required>
+                  <input name="Property Class" id="property-class" aria-describedby="property-class-help" list="class-options" autocomplete="off" placeholder="Type a class code or search its description" required>
                   <datalist id="class-options">
                   </datalist>
+                  <small id="property-class-help">Enter the property class code listed on your Cook County Assessor record.</small>
                 </label>
                 <details>
                   <summary>
@@ -232,18 +233,18 @@
                 <div class="grid three">
                   <label>
                     Building area (sq ft)
-                    <input name="Building Area (sq ft)" type="number" min="100" max="30000" step="1" required value="1400">
-                    <small>
-                      Exterior measurements
-                    </small>
+                    <input name="Building Area (sq ft)" aria-describedby="building-area-help" type="number" min="100" max="30000" step="1" required value="1400">
+                    <small id="building-area-help">Use the Assessor’s recorded building area, measured from exterior walls.</small>
                   </label>
                   <label>
                     Land area (sq ft)
-                    <input name="Land Area (sq ft)" type="number" min="100" max="1000000" step="1" required value="3750">
+                    <input name="Land Area (sq ft)" aria-describedby="land-area-help" type="number" min="100" max="1000000" step="1" required value="3750">
+                    <small id="land-area-help">Enter the total lot size, including the land beneath the building and surrounding outdoor space.</small>
                   </label>
                   <label>
                     Year built
-                    <input name="Year Built" id="year-built" type="number" min="1600" step="1" required value="1950">
+                    <input name="Year Built" id="year-built" aria-describedby="year-built-help" type="number" min="1600" step="1" required value="1950">
+                    <small id="year-built-help">Enter the year the building was originally constructed.</small>
                   </label>
                 </div>
               </fieldset>
